@@ -44,8 +44,6 @@ function fetchJSON(url) {
 
   let nextPrayerMinutes = null;
   let nextPrayerIndex = null;
-  let nextPrayerName = null;
-  let isTomorrow = false;
 
   for (let i = 0; i < prayersInMinutes.length; i++) {
     if (nowMinutes < prayersInMinutes[i]) {
