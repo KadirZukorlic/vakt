@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+
+const https = require("https");
+
+const CITY_ID = 117;
+const URL = `https://api.vaktija.ba/vaktija/v1/${CITY_ID}`;
+
+// Color codes
+const colors = {
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+};
+
+function fetchJSON(url) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve(JSON.parse(data)));
+      })
+      .on("error", reject);
+  });
+}
+
+(async () => {
+  const data = await fetchJSON(URL);
+  const { vakat } = data;
+
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const prayersInMinutes = vakat.map((time) => {
+    const [h, m] = time.split(":").map(Number);
+    return h * 60 + m;
+  });
+
+  let nextPrayerMinutes = null;
+  let nextPrayerIndex = null;
+  let nextPrayerName = null;
+  let isTomorrow = false;
+
+  for (let i = 0; i < prayersInMinutes.length; i++) {
+    if (nowMinutes < prayersInMinutes[i]) {
+      nextPrayerIndex = i;
+      nextPrayerMinutes = prayersInMinutes[i];
+      break;
+    }
+  }
+
+  const prayerInfo = getPrayerInfo(nextPrayerIndex);
+
+  console.log(
+    `${prayerInfo.icon} ${prayerInfo.color}${prayerInfo.name}${
+      colors.reset
+    } je za ${colors.bright}${colors.yellow}${nextPrayerMinutes - nowMinutes}${
+      colors.reset
+    } minuta`
+  );
+})();
+
+function getPrayerInfo(index) {
+  const prayers = [
+    { name: "Sabah", icon: "🌅", color: colors.blue },
+    { name: "Podne", icon: "☀️", color: colors.yellow },
+    { name: "Ikindija", icon: "🌤️", color: colors.magenta },
+    { name: "Akšam", icon: "🌆", color: colors.red },
+    { name: "Jacija", icon: "🌙", color: colors.cyan },
+  ];
+  return prayers[index] || prayers[0];
+}
