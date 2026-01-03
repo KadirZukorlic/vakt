@@ -54,23 +54,47 @@ function fetchJSON(url) {
   }
 
   const prayerInfo = getPrayerInfo(nextPrayerIndex);
+  const minutesRemaining = nextPrayerMinutes - nowMinutes;
+  const timeString = formatTime(minutesRemaining);
 
   console.log(
-    `${prayerInfo.icon} ${prayerInfo.color}${prayerInfo.name}${
-      colors.reset
-    } je za ${colors.bright}${colors.yellow}${nextPrayerMinutes - nowMinutes}${
-      colors.reset
-    } minuta`
+    `${prayerInfo.icon} ${prayerInfo.color}${prayerInfo.name} je za ${colors.bright}${colors.yellow}${timeString}${colors.reset}`
   );
 })();
+
+function formatTime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  let result = "";
+  if (hours > 0) {
+    if (hours === 1) {
+      result += "1 sat";
+    } else if (hours === 2 || hours === 3 || hours === 4) {
+      result += `${hours} sata`;
+    } else {
+      result += `${hours} sati`;
+    }
+  }
+
+  if (mins > 0) {
+    if (hours > 0) {
+      result += " i ";
+    }
+    result += `${mins} minuta`;
+  }
+
+  return result;
+}
 
 function getPrayerInfo(index) {
   const prayers = [
     { name: "Sabah", icon: "🌅", color: colors.blue },
-    { name: "Podne", icon: "☀️", color: colors.yellow },
+    { name: "Izlazak sunca", icon: "☀️", color: colors.yellow },
     { name: "Ikindija", icon: "🌤️", color: colors.magenta },
     { name: "Akšam", icon: "🌆", color: colors.red },
     { name: "Jacija", icon: "🌙", color: colors.cyan },
   ];
+
   return prayers[index] || prayers[0];
 }
