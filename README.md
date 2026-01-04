@@ -2,6 +2,10 @@
 
 A CLI tool that displays the next prayer time from [vaktija.ba](https://vaktija.ba) API.
 
+## Requirments
+
+`Nodejs` installed.
+
 ## Usage
 
 ```bash
